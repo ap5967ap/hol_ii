@@ -1,7 +1,8 @@
-#include <signal.h>
+#include<signal.h>
 #include<stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<bits/sigaction.h>
 
 void handler()
 {

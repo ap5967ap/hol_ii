@@ -1,18 +1,15 @@
 #include <stdio.h>
-#include <sys/types.h>
-#include <signal.h>
-#include <stdlib.h>
 #include <unistd.h>
+#include <signal.h>
 
-int main()
-{
+int main(){
+
     int pid;
-    printf("Enter the process pid to send signal: ");
+    printf("Enter pid \n");
     scanf("%d", &pid);
-    if(kill(pid, SIGSTOP) == -1)
-    {
-        perror("kill");
-        exit(1);
-    }
-    printf("Sent SIGSTOP signal to process with PID %d\n", pid);
-}
+
+    printf("Sending SIGSTOP to process with pid %d\n", pid);
+    kill(pid, SIGSTOP);
+
+    return (0);
+}   

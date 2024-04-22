@@ -1,21 +1,21 @@
-#include <stdio.h>
-#include <signal.h>
 #include <unistd.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <bits/sigaction.h>
 
-void handler(int sig)
-{
-    printf("handler %d\n", sig);
+void handler (int sig){
+    printf("Signal %d has been caught\n", sig);
+    exit(0);
 }
 
-int main()
-{
-    printf("PID: %d\n", getpid());
-    struct sigaction sa;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_handler=handler;
-    printf("Waiting for SIGSTOP signal\n");
-    while(1)
-    {
-        sigaction(SIGSTOP, &sa, NULL);
-    }
+int main(){
+
+    printf("Process pid id %d\n", getpid());
+    printf("waiting for signal SIGSTOP\n");
+    signal(SIGSTOP, handler);
+    getchar();
+    return (0);
 }
