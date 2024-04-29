@@ -11,6 +11,7 @@ int main()
         return 1;
     }
     char buf[BUFSIZ];
+    printf("Enter the message \n");
     scanf("%[^\n]", buf);
     if(write(fd[1], buf, BUFSIZ) == -1)
     {

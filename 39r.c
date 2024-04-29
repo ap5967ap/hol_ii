@@ -1,45 +1,32 @@
 #include <stdio.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <sys/time.h>
-#define pr perror
-#define pt(a) printf("%s\n",a)
-#define pt1(a) printf("%d\n",a)
 
-int main()
-{
+int main(){
     fd_set rfds;
     struct timeval tv;
-    int retval;
-    int fd=open("myFifo",O_RDONLY,0666);
-    if(fd==-1)
-    {
-        pr("open");
-        exit(1);
-    }
+
+    int fd = open("myfifo", O_RDWR, 0666);
+    printf("Timer started for 10 seconds.\n");
+
     FD_ZERO(&rfds);
-    FD_SET(fd, &rfds);  
+    FD_SET(fd, &rfds);
+
     tv.tv_sec = 10;
     tv.tv_usec = 0;
-    retval = select(fd+1, &rfds, NULL, NULL, &tv);
-    if (retval == -1)
-        pr("select()");
-    else if (retval)
-        
-        {
-            pt("Data is available now.\n");
-            char buf[BUFSIZ];
-            if(read(fd,buf,BUFSIZ)==-1)
-            {
-                pr("read");
-                return 1;
-            }
-            printf("Data read from fifo is %s\n",buf);
-        }
 
-    else
-        printf("No data within ten seconds.\n");
+    int stat = select(fd + 1, &rfds, NULL, NULL, &tv);
+
+    if (stat){
+        char buf[100];
+        read(fd, buf, sizeof(buf));
+        printf("Data from fifo: %s", buf);
+    }
+    else{
+        printf("No data got in 10 seconds.\n");
+    }
+    close(fd);
+    return (0);
 }

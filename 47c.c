@@ -16,8 +16,14 @@ int main()
     int i=0;
     int shmid=shmget(key,0,0);
     char *data = shmat(shmid, (void *)0, SHM_RDONLY);
-    while(i<5) {sleep(1); i++;}
-    shmdt(data);
+    printf("Press enter to detach\n");
+    getchar();
+    if(shmdt(data)==-1)
+    {
+        pr("shmdt");
+        return 1;
+    }
+    printf("Detached\n");
     return 0;
 
 }

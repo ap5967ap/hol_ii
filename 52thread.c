@@ -1,3 +1,5 @@
+#define _DECLARE_GETTID
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -11,44 +13,39 @@
 #include <arpa/inet.h>
 struct arg
 {
-    int nsfsd;
-    struct sockaddr_in client_address;
+    int nsd;
+    struct sockaddr_in cli;
 };
-void *conn(void *args)
-{
-    struct sockaddr_in client_address;
-    int nsfd = ((struct arg *)args)->nsfsd;
-    client_address = ((struct arg *)args)->client_address;
-    printf("Handling client from %s:%d\n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
-    char buf[BUFSIZ];
-    write(nsfd, "Message From server\n", sizeof("Message From server\n"));
+
+void *handleconnect(void* ag){
+    int sd = ((struct arg *)ag)->nsd;
+    struct sockaddr_in cli = ((struct arg *)ag)->cli;
+    char buf[1000];
+    read(sd,buf,1000);
+    printf("Message from client: %s",buf);
+    printf("Handling client %s from child process with tid %d\n",inet_ntoa(cli.sin_addr),gettid());
+    
+    write(sd,"Hello, from server\n",sizeof("Hello, from server\n"));
+    close(sd);
 }
 
-int main()
-{
-    struct sockaddr_in server, client;
-    int sd, nsd, clientLen;
+int main(){
+    struct sockaddr_in serv,cli;
     pthread_t threads;
-    bool result;
-    sd = socket(AF_INET, SOCK_STREAM, 0);
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = inet_addr("127.0.0.1");
-    server.sin_port = htons(5555);
-    bind(sd, (struct sockaddr *)&server, sizeof(server));
-    listen(sd, 5);
-    while (1)
-    {
-        clientLen = sizeof(client);
-        nsd = accept(sd, (struct sockaddr *)&client, &clientLen);
-        write(1, "Connected to the client.....\n", sizeof("Connected to the client.....\n"));
-        struct arg nsds={nsd, client};
-        if (pthread_create(&threads, NULL, (void *)conn, (void *)&nsds) < 0)
-        {
-            perror("could not create thread");
-            return 1;
-        }
+    int sd = socket(AF_INET,SOCK_STREAM,0);
+    serv.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(5041);
+    bind(sd,(struct sockaddr *) &serv,sizeof(serv));
+    listen(sd,5);
+    while(1){
+        int len = sizeof(cli);
+        int nsd = accept(sd,(struct sockaddr *) &cli,&len);
+        struct arg ad;
+        ad.nsd = nsd;
+        ad.cli = cli;
+        pthread_create(&threads,NULL,(void *)handleconnect,(void*)&ad);
     }
     pthread_exit(NULL);
     close(sd);
-    return 0;
 }

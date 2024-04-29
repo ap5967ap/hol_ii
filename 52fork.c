@@ -5,74 +5,34 @@
 #include <unistd.h>
 #include <string.h>
 
+int main(){
+    struct sockaddr_in serv,cli;
+    char buf[1000];
 
-int main(int argc, char const *argv[])
-{
-    int socket_fd, new_socket_fd;
-    struct sockaddr_in server_address, client_address;
-    char buffer[BUFSIZ];
-    memset(buffer, 0, sizeof(buffer));
-    if ((socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0)
-    {
-        perror("Socket creation failed");
-        exit(EXIT_FAILURE);
-    }
-    server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
-    server_address.sin_port = htons(5555);
-    int tr=1;
+    int sd = socket(AF_INET,SOCK_STREAM,0);
 
-// kill "Address already in use" error message
-    if (setsockopt(socket_fd,SOL_SOCKET,SO_REUSEADDR,&tr,sizeof(int)) == -1) {
-        perror("setsockopt");
-        exit(1);
-    }
-
-    if (bind(socket_fd, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
-    {
-        perror("Bind failed");
-        exit(EXIT_FAILURE);
-    }
-    if (listen(socket_fd, 5) < 0)
-    {
-        perror("Listen failed");
-        exit(EXIT_FAILURE);
-    }
-    printf("Server is listening on port %d\n", 5555);
-    while (1)
-    {
-        int address_len = sizeof(client_address);
-        if ((new_socket_fd = accept(socket_fd, (struct sockaddr *)&client_address, (socklen_t *)&address_len)) < 0)
-        {
-            perror("Accept failed");
-            exit(EXIT_FAILURE);
-        }
+    serv.sin_addr.s_addr = INADDR_ANY;
+    // serv.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(5041);
+    bind(sd,(struct sockaddr *)&serv,sizeof(serv));
+    listen(sd,5);
+    // printf("Server listening on port 5000\n");
+    // printf("\n");
+    // write(1,"Server listening on port 5000\n",sizeof("Server listening on port 5000\n"));
+    while(1){
+        int len = sizeof(cli);
+        int nsd = accept(sd,(struct sockaddr *)&cli,&len);
         int pid = fork();
-        if (pid < 0)
-        {
-            perror("Fork failed");
-            exit(EXIT_FAILURE);
+        if(pid==0){ 
+            printf("Handling client %s from child process with pid %d\n",inet_ntoa(cli.sin_addr),getpid());
+            read(nsd,buf,100);
+            printf("Message from client: %s",buf);
+            write(nsd,"Hello, from server\n",sizeof("Hello, from server\n"));
+            close(nsd);
         }
-        else if (pid == 0)
-        {
-            printf("Handling client from %s:%d\n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
-            char *message = "Hello from server";
-            int write_size = write(new_socket_fd, message, strlen(message));
-            if (write_size < 0)
-            {
-                perror("Write failed");
-                exit(EXIT_FAILURE);
-            }
-            printf("Sent message to client: %s\n", message);
-            close(new_socket_fd);
-            exit(EXIT_SUCCESS);
-        }
-        else
-        {
-            close(new_socket_fd);
+        else{
+            close(nsd);
         }
     }
-    close(socket_fd);
-
-    return 0;
 }

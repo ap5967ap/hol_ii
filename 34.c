@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
     if(argc!=2)
     {
-        pt("Usage: ./a.out dup|dup2|fnctl");
+        pt("Usage: ./a.out dup | dup2 | fnctl");
         return 1;
     }
     int fd[2];
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 			close(0);
 			close(fd[1]);
 			dup(fd[0]);
-			execl("/bin/ls", "/bin/ls", "-l", NULL);
+			execl("/bin/wc", "/bin/wc", NULL);
 
 		}
     }
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
             wait(NULL);
             close(fd[1]);
             dup2(fd[0],0);
-            execl("/bin/ls", "/bin/ls", "-l", NULL);
+            execl("/bin/wc", "/bin/wc", NULL);
 
         }
     }
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
             close(0);
 			close(fd[1]);
 			fcntl(fd[0], F_DUPFD, 0);
-			execl("/bin/ls", "/bin/ls", "-l", NULL);
+			execl("/bin/wc", "/bin/wc", NULL);
 
         }
     }

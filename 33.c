@@ -16,7 +16,7 @@ int main()
     }
     if(!fork())
     {
-        pt("Enter the message to send to parent");
+        pt("Child:Enter the message to send to parent");
         char buf[BUFSIZ];
         scanf("%[^\n]",buf);
         close(fd1[0]);
@@ -34,7 +34,7 @@ int main()
             return 1;
         }
         close(fd2[0]);
-        pt("Data read from parent:");
+        pt("Child:Data read from parent:");
         pt(buf2);
     }
     else
@@ -47,9 +47,9 @@ int main()
             return 1;
         }
         close(fd1[0]);
-        pt("Data read from child:");
+        pt("Parent:Data read from child:");
         pt(buf);
-        pt("Enter the message to send to child");
+        pt("Parent:Enter the message to send to child");
         char buf2[BUFSIZ];
         scanf("%[^\n]",buf2);
         close(fd2[0]);

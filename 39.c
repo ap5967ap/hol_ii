@@ -12,7 +12,7 @@
 int main()
 {
     char buf[BUFSIZ];
-    int fd=open("myFifo",O_WRONLY,0666);
+    int fd=open("myfifo",O_WRONLY,0666);
     pt("Enter the message to send to fifo");
     scanf("%[^\n]", buf);
     if(fd==-1)

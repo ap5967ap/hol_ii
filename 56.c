@@ -20,6 +20,7 @@ int main()
         getppid();
     }
     end = rdtsc();
-    printf("Time: %f\n ms", (end - st)/(400 * 1e6));
+    //cat /proc/cpuinfo for cpu frequency
+    printf("Time: %f ms\n", (end - st)/(1087.806 * 1e6));
     
 }

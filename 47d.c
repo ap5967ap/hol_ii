@@ -15,10 +15,16 @@ int main()
         return 1;
     }
     int shmid = shmget(key,0,0);
+    if(shmid==-1)
+    {
+        pr("shmget");
+        return 1;
+    }
     if(shmctl(shmid,IPC_RMID,NULL)==-1)
     {
         pr("shmctl");
         return 1;
     }
+    printf("Deleted\n");
     return 0;
 }
